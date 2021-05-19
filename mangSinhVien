@@ -1,0 +1,192 @@
+
+package Mang;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class mangSinhVien {
+	private ArrayList<sinhVien> a = new ArrayList<sinhVien>();
+	public sinhVien nhapSinhVien(String text){
+		System.out.println(text);
+		String ma, ht, qq;
+		int ngay, thang, nam;
+		boolean gt;
+		double diem;
+		Scanner kb = new Scanner(System.in);
+		System.out.print("Nhap ma SV:");
+		ma = kb.nextLine();
+		System.out.print("Nhap ho ten:");
+		ht = kb.nextLine();
+		System.out.print("Nhap que quan:");
+		qq = kb.nextLine();
+		System.out.print("Nhap ngay sinh (ngay, thang, nam) :");
+		ngay = kb.nextInt();
+		thang = kb.nextInt();
+		nam = kb.nextInt();
+		System.out.print("Nhap gioi tinh:");
+		gt = kb.nextBoolean();
+		System.out.print("Nhap diem:");
+		diem = kb.nextDouble();
+		sinhVien x = new sinhVien(ma,ht,qq,new ngayThang(ngay,thang,nam),gt,diem);
+		return x;
+	}
+
+	public void input(){
+		int n;
+		Scanner kb = new Scanner(System.in);
+		do{
+			System.out.print("Nhap so SV >0:");
+			n = kb.nextInt();
+		}while(n<=0);
+		for(int i = 1; i<=n;i++){
+			sinhVien x = nhapSinhVien("Nhap sinh vien thu "+ i);
+			a.add(x);
+		}
+		
+	}
+	public void xuatDS(String noiDung){
+        System.out.println(noiDung);
+        for(sinhVien x :a){
+            System.out.println(x);
+        }
+       }
+        public double diemTrungBinhChung(){
+        double s =0;
+        for(sinhVien x :a){
+            s+=x.getDiemTB();
+        }
+        return s/a.size();
+    }
+    
+    public void congDiemQueNgheAn(){
+        for(int i=0;i<a.size();i++){
+            if(a.get(i).getQueQuan().equalsIgnoreCase("Nghe An"))
+                a.get(i).setDiemTB(a.get(i).getDiemTB()+0.5);
+        }
+    }
+    public void congDiemSinh2000(){
+        double x;
+        Scanner kb = new Scanner(System.in);
+        System.out.println("Nhap so diem muon cong: ");
+        x = kb.nextDouble();
+        for(int i=0;i<a.size();i++){
+            if(a.get(i).getNgaySinh().getNam()==2000){
+                a.get(i).setDiemTB(a.get(i).getDiemTB()+x);
+            }
+        }
+        
+    }
+    public void diemChungTheoGioiTinh(){
+        double countt=0,countf=0;
+        double sumt=0,sumn=0;
+        for(int i=0;i<a.size();i++){
+            if(a.get(i).isGioiTinh()==true){
+                sumt+=a.get(i).getDiemTB();
+                countt++;
+            }
+            else{
+                sumn+=a.get(i).getDiemTB();
+                countf++;
+            }
+        }
+        System.out.println("Diem trung binh chung theo gioi tinh nam : "+(sumt/countt));
+        System.out.println("Diem trung binh chung theo gioi tinh nu : "+(sumn/countf));
+    }
+    public void loaiSVcoDiemTBnho(){
+    	double x = diemTrungBinhChung();
+        for(int i=0;i<a.size();i++){
+        	for(int j=0;j<a.size();j++)
+            if(a.get(j).getDiemTB()<x){
+            	System.out.println(j);
+            	System.out.println(a.get(j));
+            	System.out.println("len:"+a.size());
+                a.remove(j);
+            }
+        }
+    }
+    public void sapXep(){
+        for(int i=0;i<a.size()-1;i++){
+            for(int j=i+1;j<a.size();j++){
+                if(a.get(i).getDiemTB()<a.get(j).getDiemTB()){
+                    sinhVien t = a.get(i);
+                    a.set(i, a.get(j));
+                    a.set(j, t);
+                }
+            }
+        }
+    }
+    public void xacDinhViThu(){
+        for(int i=0;i<a.size();i++){
+            int vt=1;
+            for(int j=0;j<a.size();j++)
+                if(i!=j)
+                    if(a.get(j).getDiemTB()>a.get(i).getDiemTB())
+                        vt++;
+            System.out.println(a.get(i)+"vi thu "+vt);
+        }
+    }
+    public void DocFile(String tenFile) {
+        try {
+            File f = new File(tenFile);
+            if (f.exists()) {
+                Scanner read = new Scanner(f);
+                while(read.hasNext()){
+                    sinhVien x;
+                    String ma, ht="", qq="";
+                    int ngay, thang, nam;
+                    boolean gt;
+                    double diem;
+                    Scanner line = new Scanner(read.nextLine());
+                    ma = line.next();
+                    while (!line.hasNextBoolean())
+                        ht = ht + line.next()+" ";
+                        ht=ht.trim();
+                        gt = line.nextBoolean();
+                    while (!line.hasNextInt())
+                        qq = qq + line.next()+" ";
+                        qq=qq.trim();
+                    ngay = line.nextInt();
+                    thang = line.nextInt();
+                    nam = line.nextInt();
+                    diem = line.nextDouble();
+                    x =(new sinhVien(ma,ht,qq, new ngayThang(ngay, thang, nam),gt,diem));
+                    a.add(x);
+                }
+            }else System.out.println("file khong ton tai");
+        }catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    public void output(){
+        xuatDS("Danh Sach Sinh Vien Vua Nhap");
+        System.out.println("............................");
+        System.out.println("Diem trung binh chung: "+diemTrungBinhChung());
+        System.out.println("............................");
+        diemChungTheoGioiTinh();
+        System.out.println("............................");
+        congDiemQueNgheAn();
+        xuatDS("Danh Sach Sau Khi Cong ");
+        System.out.println("............................");
+        congDiemSinh2000();
+        xuatDS("Danh Sach Sau Khi Cong ");
+        System.out.println("............................");
+        sapXep();
+        xuatDS("Danh Sach Sau Khi Sap Xep ");
+        System.out.println("............................");
+        xacDinhViThu();
+        System.out.println("............................");
+        loaiSVcoDiemTBnho();
+        xuatDS("Danh Sach Sau Khi Loai ");
+        
+        
+    }
+	public static void main(String[] args) {
+		mangSinhVien a = new mangSinhVien();
+		a.DocFile("D:\\sinhvien.txt");
+                //a.input();
+		a.output();
+        }
+}
